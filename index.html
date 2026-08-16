@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porter Matrix Pro | Consultoría y Mentoría de Competitividad</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        },
+                        accent: {
+                            emerald: '#10b981',
+                            amber: '#f59e0b',
+                            rose: '#f43f5e',
+                            indigo: '#6366f1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+            .print-break-inside-avoid { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Top Header / Bar -->
+    <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-chess-knight text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-white flex items-center gap-2">
+                        Porter 5 Forces <span class="bg-blue-500/10 text-blue-400 text-xs px-2 py-0.5 rounded-md border border-blue-500/20 font-medium">Mentoría Suite</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Análisis del Microentorno y Estrategia Competitiva</p>
+                </div>
+            </div>
+
+            <!-- Action buttons header -->
+            <div class="flex items-center gap-2">
+                <button onclick="app.resetData()" class="px-3 py-1.5 text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition border border-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left"></i> Restablecer
+                </button>
+                <button onclick="window.print()" class="px-3.5 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-md transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-pdf"></i> Imprimir / Exportar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Navigation Tabs -->
+        <div class="bg-slate-950 p-1.5 rounded-2xl border border-slate-800 flex flex-wrap gap-1 no-print">
+            <button onclick="app.setTab('inputs')" id="tab-btn-inputs" class="tab-btn flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 bg-blue-600 text-white shadow-md">
+                <i class="fa-solid fa-sliders"></i> 1. Empresa & Parámetros
+            </button>
+            <button onclick="app.setTab('forces')" id="tab-btn-forces" class="tab-btn flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-shield-halved"></i> 2. Análisis de 5 Fuerzas
+            </button>
+            <button onclick="app.setTab('dashboard')" id="tab-btn-dashboard" class="tab-btn flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-chart-pie"></i> 3. Tablero & Simulador
+            </button>
+            <button onclick="app.setTab('report')" id="tab-btn-report" class="tab-btn flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-file-contract"></i> 4. Matriz & Informe
+            </button>
+        </div>
+
+        <!-- TAB 1: DATOS DE ENTRADA & PERFILES -->
+        <section id="tab-inputs" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left Column: Inputs Form -->
+                <div class="lg:col-span-2 bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-id-card text-blue-500"></i> Datos del Caso de Estudio
+                            </h2>
+                            <p class="text-xs text-slate-400">Define las variables contextuales para el análisis de microentorno</p>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">Fase 1 de Consultoría</span>
+                    </div>
+
+                    <!-- Form Inputs Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Empresa / Marca *</label>
+                            <input type="text" id="input-company" onchange="app.updateMetadataFromInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition" placeholder="Ej. NimbusCloud ERP">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Sector / Industria *</label>
+                            <input type="text" id="input-industry" onchange="app.updateMetadataFromInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition" placeholder="Ej. Software de Gestión Empresarial en la Nube">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Mercado / Geografía *</label>
+                            <input type="text" id="input-market" onchange="app.updateMetadataFromInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition" placeholder="Ej. Latinoamérica / Empresas Medianas B2B">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Consultor / Mentor</label>
+                            <input type="text" id="input-consultant" onchange="app.updateMetadataFromInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition" placeholder="Ej. Consultoría Estratégica LatAm">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Modelo de Negocio / Producto Principal *</label>
+                            <textarea id="input-businessModel" rows="3" onchange="app.updateMetadataFromInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition custom-scrollbar" placeholder="Describa brevemente cómo genera ingresos, propuesta de valor y principales líneas de venta..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- AI Auto Analysis Button -->
+                    <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="text-xs text-slate-400">
+                            <i class="fa-solid fa-robot text-indigo-400 mr-1"></i> ¿Deseas autogenerar un análisis inicial fundamentado con IA?
+                        </div>
+                        <button onclick="app.generateAIAnalysis()" id="btn-ai-generate" class="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-medium rounded-xl text-xs shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-sparkles"></i> Generar Análisis Completo con IA
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Mentoring Instructions Card -->
+                <div class="bg-gradient-to-br from-slate-950 to-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center gap-2 text-amber-400 font-bold text-sm mb-3">
+                            <i class="fa-solid fa-lightbulb"></i> Guía de Aplicación en Mentorías
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                            Este simulador permite conducir a los directivos o emprendedores a través del **Análisis de las 5 Fuerzas de Porter** para evaluar la atractividad estructural de la industria y la rentabilidad esperada.
+                        </p>
+                        <ul class="space-y-2.5 text-xs text-slate-400">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-blue-400 mt-0.5"></i>
+                                <span><b>Fase 1:</b> Define claramente el alcance del microentorno (no confundir competidores con sustitutos).</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-blue-400 mt-0.5"></i>
+                                <span><b>Fase 2:</b> Evalúa la intensidad real en la pestaña de 5 Fuerzas. Calibra factores clave y justificaciones.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-blue-400 mt-0.5"></i>
+                                <span><b>Fase 3:</b> Utiliza el Dashboard para simular la aplicación de <i>Iniciativas Estratégicas</i> de Porter y observa la reducción de presión.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <div class="text-xs font-semibold text-slate-300 mb-1">Paso Sigiente:</div>
+                        <button onclick="app.setTab('forces')" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition flex items-center justify-center gap-2">
+                            Ir a Calibrar las 5 Fuerzas <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: ANÁLISIS DETALLADO DE LAS 5 FUERZAS -->
+        <section id="tab-forces" class="tab-content space-y-6 hidden">
+            <div class="flex items-center justify-between bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-blue-500"></i> Calibración Cualitativa y Cuantitativa de Fuerzas
+                    </h2>
+                    <p class="text-xs text-slate-400">Evalúa la presión [Baja / Media / Alta] e identifica factores determinantes para cada fuerza</p>
+                </div>
+                <div class="text-xs text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
+                    Sustento de la Rentabilidad
+                </div>
+            </div>
+
+            <!-- Container for the 5 Forces Accordion / Cards -->
+            <div id="forces-container" class="space-y-5">
+                <!-- Dynamically generated forces cards via JavaScript -->
+            </div>
+        </section>
+
+        <!-- TAB 3: TABLERO DE CONTROL Y SIMULADOR ESTRATÉGICO -->
+        <section id="tab-dashboard" class="tab-content space-y-6 hidden">
+            <!-- Top Dashboard Bar -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl text-2xl">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Presión Media Entorno</div>
+                        <div id="dash-avg-score" class="text-xl font-bold text-white">0.0 / 5.0</div>
+                        <div id="dash-avg-badge" class="text-[10px] text-amber-400">Presión Media</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div id="dash-attractiveness-icon" class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl text-2xl">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Atractividad Global</div>
+                        <div id="dash-attractiveness-value" class="text-xl font-bold text-emerald-400">Alta</div>
+                        <div class="text-[10px] text-slate-400">Potencial de margen a LP</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl text-2xl">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Margen Proyectado</div>
+                        <div id="dash-simulated-margin" class="text-xl font-bold text-white">18.5%</div>
+                        <div id="dash-margin-diff" class="text-[10px] text-emerald-400">+0.0% por simulaciones</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl text-2xl">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Fuerza Crítica Mayor</div>
+                        <div id="dash-critical-force" class="text-sm font-bold text-rose-400 truncate max-w-[140px]">Rivalidad</div>
+                        <div class="text-[10px] text-slate-400">Requiere intervención</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Interactive Simulator Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left Column: Radar Chart and Force Scores -->
+                <div class="lg:col-span-5 bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-spider text-blue-500"></i> Diagrama Radar de Presión
+                            </h3>
+                            <span class="text-[10px] text-slate-400">Base (Original) vs Mitigado</span>
+                        </div>
+                        <div class="relative w-full aspect-square max-h-[320px] mx-auto flex items-center justify-center">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Small Legend / Score Breakdown -->
+                    <div id="forces-mini-list" class="space-y-1.5 pt-3 border-t border-slate-800">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Strategic Initiatives Simulator -->
+                <div class="lg:col-span-7 bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-xl space-y-5">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-indigo-400"></i> Simulador de Interacción de Iniciativas Estratégicas
+                            </h3>
+                            <p class="text-xs text-slate-400">Activa acciones basadas en las Estrategias Genéricas de Porter para evaluar la neutralización de fuerzas</p>
+                        </div>
+                    </div>
+
+                    <!-- Initiatives Controls -->
+                    <div id="initiatives-container" class="space-y-3">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- Comparison Impact Chart (Before vs After Simulation) -->
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-semibold text-slate-300">
+                            <span>Impacto en Reducción de Intensidad de Fuerzas</span>
+                            <span class="text-indigo-400">Simulación en Tiempo Real</span>
+                        </div>
+                        <div class="h-44 w-full">
+                            <canvas id="barSimulationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: SÍNTESIS, MATRIZ RESUMEN E INFORME EJECUTIVO -->
+        <section id="tab-report" class="tab-content space-y-6 hidden">
+
+            <!-- Executive Printable Container -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-8 text-slate-100 print-break-inside-avoid">
+
+                <!-- Header of Report -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <div class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-950/60 border border-blue-800/50 px-3 py-1 rounded-full mb-2">
+                            <i class="fa-solid fa-file-lines"></i> Informe de Diagnóstico Competitivo
+                        </div>
+                        <h2 id="report-company-title" class="text-2xl sm:text-3xl font-extrabold text-white">Empresa Genérica</h2>
+                        <p id="report-industry-subtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Sector: Sector no especificado | Mercado: Global</p>
+                    </div>
+                    <div class="text-left md:text-right text-xs text-slate-400 bg-slate-900 p-3 rounded-xl border border-slate-800">
+                        <div><b>Fecha de Análisis:</b> <span id="report-date">16 de Agosto, 2026</span></div>
+                        <div><b>Metodología:</b> 5 Fuerzas de Porter</div>
+                        <div><b>Consultor:</b> <span id="report-consultant">Consultor Estratégico</span></div>
+                    </div>
+                </div>
+
+                <!-- Business Model Card -->
+                <div class="bg-slate-900/80 p-4 sm:p-5 rounded-xl border border-slate-800">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-briefcase text-blue-400"></i> Modelo de Negocio / Producto Principal
+                    </h3>
+                    <p id="report-business-model" class="text-sm text-slate-200 leading-relaxed italic">
+                        Descripción breve del modelo de negocio...
+                    </p>
+                </div>
+
+                <!-- Synthesis Matrix Table -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-table-cells text-indigo-400"></i> Matriz Resumen de las 5 Fuerzas de Porter
+                    </h3>
+                    <div class="overflow-x-auto rounded-xl border border-slate-800">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-900 text-slate-300 font-semibold border-b border-slate-800 uppercase text-[11px] tracking-wider">
+                                <tr>
+                                    <th class="p-3.5">Fuerza Competitiva</th>
+                                    <th class="p-3.5">Nivel de Presión</th>
+                                    <th class="p-3.5">Factor Clave de Mayor Impacto</th>
+                                    <th class="p-3.5">Efecto en Márgenes / Ventas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-matrix-tbody" class="divide-y divide-slate-800 bg-slate-950/50">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Industry Attractiveness & Long Term Risk Synthesis -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="report-attractiveness-box" class="p-5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2">
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Atractividad Global de la Industria</div>
+                        <div id="report-attractiveness-badge" class="text-2xl font-black text-emerald-400 flex items-center gap-2">
+                            Alta
+                        </div>
+                        <p id="report-attractiveness-desc" class="text-xs text-slate-300 leading-relaxed">
+                            Evaluación basada en el balance de presión de las 5 fuerzas.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2">
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Riesgo Principal para la Rentabilidad a Largo Plazo
+                        </div>
+                        <p id="report-longterm-risk" class="text-xs text-slate-200 leading-relaxed pt-1">
+                            Calculando principales vectores de riesgo estratégico...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Actionable Strategic Recommendations -->
+                <div class="space-y-4 pt-4 border-t border-slate-800">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chess-king text-amber-400"></i> Recomendaciones Estratégicas Accionables
+                        </h3>
+                        <p class="text-xs text-slate-400">Iniciativas diseñadas según la Ventaja Competitiva de Porter (Liderazgo en Costes, Diferenciación o Enfoque) para mitigar fuerzas de presión Alta / Media</p>
+                    </div>
+
+                    <div id="report-recommendations-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Footer Signatures -->
+                <div class="pt-8 border-t border-slate-800 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        Generado por <b>Porter 5 Forces Mentoría Suite</b> • Herramienta de Consultoría Estratégica
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span>Firma Consultor: ____________________</span>
+                        <span>Aprobado Cliente: ____________________</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /**
+         * Global Application State and Porter 5 Forces Definition Model
+         */
+        const PORTER_FORCES_META = [
+            {
+                id: 'rivalry',
+                name: 'Rivalidad entre Competidores Existentes',
+                icon: 'fa-swords',
+                color: 'rose',
+                defaultFactors: ['Crecimiento del sector', 'Estructura de costes fijos', 'Diferenciación de producto', 'Barreras de salida'],
+                description: 'Grado de intensidad de la competencia directa entre las empresas establecidas en la industria.'
+            },
+            {
+                id: 'buyers',
+                name: 'Poder de Negociación de Clientes (Compradores)',
+                icon: 'fa-users',
+                color: 'sky',
+                defaultFactors: ['Concentración de compradores', 'Costes de cambio para clientes', 'Disponibilidad de sustitutos', 'Sensibilidad al precio'],
+                description: 'Capacidad de los clientes para exigir precios más bajos, mejor calidad o más servicios.'
+            },
+            {
+                id: 'suppliers',
+                name: 'Poder de Negociación de Proveedores',
+                icon: 'fa-truck-field',
+                color: 'amber',
+                defaultFactors: ['Concentración de proveedores', 'Coste de cambio de proveedor', 'Insumos especializados', 'Amenaza de integración hacia adelante'],
+                description: 'Capacidad de los suministradores de elevar precios o limitar la calidad del insumo.'
+            },
+            {
+                id: 'entrants',
+                name: 'Amenaza de Nuevos Competidores Entrantes',
+                icon: 'fa-user-plus',
+                color: 'indigo',
+                defaultFactors: ['Economías de escala', 'Requerimientos de capital', 'Acceso a canales de distribución', 'Barreras regulatorias'],
+                description: 'Facilidad con la que nuevas empresas pueden ingresar al mercado a restar cuota.'
+            },
+            {
+                id: 'substitutes',
+                name: 'Amenaza de Productos o Servicios Sustitutos',
+                icon: 'fa-repeat',
+                color: 'emerald',
+                defaultFactors: ['Relación calidad/precio del sustituto', 'Lealtad de marca', 'Innovación tecnológica', 'Tendencias del mercado'],
+                description: 'Productos de otras industrias que satisfacen la misma necesidad fundamental del cliente.'
+            }
+        ];
+
+        function getInitialForcesData() {
+            const forces = {};
+            PORTER_FORCES_META.forEach(meta => {
+                forces[meta.id] = {
+                    pressure: "Media",
+                    score: 3.0,
+                    factors: [...meta.defaultFactors.slice(0, 3)],
+                    justification: "",
+                    impact: ""
+                };
+            });
+            return forces;
+        }
+
+        /**
+         * Generic Strategic Initiatives Definitions for Simulation
+         */
+        const INITIATIVES_PRESETS = [
+            {
+                id: 'init_differentiation',
+                title: 'Estrategia de Diferenciación de Producto / Experiencia',
+                type: 'Diferenciación',
+                icon: 'fa-gem',
+                description: 'Aumentar el valor percibido mediante calidad superior, branding de prestigio, tecnología propietaria y excelente soporte.',
+                impacts: { buyers: -1.2, rivalry: -1.0, substitutes: -0.8 },
+                marginDelta: 4.2,
+                active: true
+            },
+            {
+                id: 'init_cost_leadership',
+                title: 'Liderazgo en Costes / Eficiencia Operativa',
+                type: 'Liderazgo en Costes',
+                icon: 'fa-bolt',
+                description: 'Automatización de procesos, optimización logística y reducción de costes fijos para mantener precios competitivos con margen sano.',
+                impacts: { buyers: -0.5, entrants: -1.0, rivalry: -0.8 },
+                marginDelta: 3.5,
+                active: false
+            },
+            {
+                id: 'init_vertical_integration',
+                title: 'Integración Vertical o Alianzas de Proveedores',
+                type: 'Estructura',
+                icon: 'fa-link',
+                description: 'Asegurar el suministro clave mediante contratos de largo plazo, adquisiciones o alianzas estratégicas.',
+                impacts: { suppliers: -1.5, rivalry: -0.4 },
+                marginDelta: 2.8,
+                active: false
+            },
+            {
+                id: 'init_switching_costs',
+                title: 'Aumento de Costes de Cambio (Lock-in de Clientes)',
+                type: 'Enfoque',
+                icon: 'fa-lock',
+                description: 'Creación de ecosistemas integrados, programas de lealtad, integraciones API y contratos de permanencia con alto valor continuado.',
+                impacts: { buyers: -1.4, substitutes: -1.1 },
+                marginDelta: 3.0,
+                active: true
+            }
+        ];
+
+        class PorterApp {
+            constructor() {
+                // Clean Initial State
+                this.metadata = {
+                    company: "",
+                    industry: "",
+                    market: "",
+                    consultant: "",
+                    businessModel: ""
+                };
+
+                this.forcesData = getInitialForcesData();
+                this.initiatives = JSON.parse(JSON.stringify(INITIATIVES_PRESETS));
+                
+                this.activeTab = 'inputs';
+                this.radarChart = null;
+                this.barChart = null;
+            }
+
+            init() {
+                this.populateInputs();
+                this.renderForcesCards();
+                this.renderInitiatives();
+                this.updateAllViews();
+            }
+
+            setTab(tabId) {
+                this.activeTab = tabId;
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                    btn.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/60');
+                });
+
+                const activeContent = document.getElementById(`tab-${tabId}`);
+                if (activeContent) activeContent.classList.remove('hidden');
+
+                const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+                if (activeBtn) {
+                    activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+                    activeBtn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/60');
+                }
+
+                if (tabId === 'dashboard') {
+                    setTimeout(() => this.renderCharts(), 100);
+                } else if (tabId === 'report') {
+                    this.renderReport();
+                }
+            }
+
+            populateInputs() {
+                document.getElementById('input-company').value = this.metadata.company;
+                document.getElementById('input-industry').value = this.metadata.industry;
+                document.getElementById('input-market').value = this.metadata.market;
+                document.getElementById('input-consultant').value = this.metadata.consultant;
+                document.getElementById('input-businessModel').value = this.metadata.businessModel;
+            }
+
+            updateMetadataFromInput() {
+                this.metadata.company = document.getElementById('input-company').value || "Empresa Genérica";
+                this.metadata.industry = document.getElementById('input-industry').value || "Sector no especificado";
+                this.metadata.market = document.getElementById('input-market').value || "Global";
+                this.metadata.consultant = document.getElementById('input-consultant').value || "Consultor Estratégico";
+                this.metadata.businessModel = document.getElementById('input-businessModel').value || "Sin descripción";
+                this.updateAllViews();
+            }
+
+            resetData() {
+                if (confirm("¿Deseas restablecer todos los datos del análisis a un estado inicial limpio?")) {
+                    this.metadata = {
+                        company: "",
+                        industry: "",
+                        market: "",
+                        consultant: "",
+                        businessModel: ""
+                    };
+                    this.forcesData = getInitialForcesData();
+                    this.populateInputs();
+                    this.renderForcesCards();
+                    this.updateAllViews();
+                    this.showNotification("Datos restablecidos correctamente.");
+                }
+            }
+
+            renderForcesCards() {
+                const container = document.getElementById('forces-container');
+                if (!container) return;
+
+                container.innerHTML = PORTER_FORCES_META.map(meta => {
+                    const data = this.forcesData[meta.id] || {
+                        pressure: "Media",
+                        score: 3.0,
+                        factors: meta.defaultFactors.slice(0, 3),
+                        justification: "Justificación estándar de la fuerza...",
+                        impact: "Efecto moderado en el margen operativo del negocio."
+                    };
+
+                    const pressureColors = {
+                        "Baja": "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+                        "Media": "bg-amber-500/10 text-amber-400 border-amber-500/30",
+                        "Alta": "bg-rose-500/10 text-rose-400 border-rose-500/30"
+                    };
+
+                    return `
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-blue-400">
+                                        <i class="fa-solid ${meta.icon} text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-base text-white">${meta.name}</h3>
+                                        <p class="text-xs text-slate-400">${meta.description}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Pressure Level Selector -->
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-slate-400 font-medium">Nivel de Presión:</span>
+                                    <div class="inline-flex rounded-xl p-1 bg-slate-900 border border-slate-800">
+                                        ${['Baja', 'Media', 'Alta'].map(lvl => `
+                                            <button onclick="app.setForcePressure('${meta.id}', '${lvl}')" 
+                                                    class="px-3 py-1 text-xs font-semibold rounded-lg transition ${data.pressure === lvl ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">
+                                                ${lvl}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
+                                <!-- Determinant Factors Checklist / Input -->
+                                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                                    <label class="font-semibold text-slate-300 block flex items-center gap-1.5">
+                                        <i class="fa-solid fa-list-check text-indigo-400"></i> Factores Determinantes (3-4 Clave):
+                                    </label>
+                                    <div class="space-y-1.5" id="factors-list-${meta.id}">
+                                        ${data.factors.map((factor, idx) => `
+                                            <div class="flex items-center gap-2">
+                                                <i class="fa-solid fa-angle-right text-blue-500"></i>
+                                                <input type="text" value="${factor}" onchange="app.updateFactorText('${meta.id}', ${idx}, this.value)"
+                                                       class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Justification -->
+                                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
+                                    <label class="font-semibold text-slate-300 block flex items-center gap-1.5">
+                                        <i class="fa-solid fa-comment-dots text-amber-400"></i> Justificación de la Calificación:
+                                    </label>
+                                    <textarea rows="3" onchange="app.updateForceField('${meta.id}', 'justification', this.value)"
+                                              class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 custom-scrollbar">${data.justification}</textarea>
+                                </div>
+
+                                <!-- Strategic Impact -->
+                                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
+                                    <label class="font-semibold text-slate-300 block flex items-center gap-1.5">
+                                        <i class="fa-solid fa-chart-line-down text-rose-400"></i> Impacto en Margen u Operaciones:
+                                    </label>
+                                    <textarea rows="3" onchange="app.updateForceField('${meta.id}', 'impact', this.value)"
+                                              class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 custom-scrollbar">${data.impact}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            setForcePressure(forceId, pressure) {
+                const scoreMap = { "Baja": 1.8, "Media": 3.2, "Alta": 4.7 };
+                this.forcesData[forceId].pressure = pressure;
+                this.forcesData[forceId].score = scoreMap[pressure] || 3.0;
+                this.renderForcesCards();
+                this.updateAllViews();
+            }
+
+            updateForceField(forceId, field, value) {
+                if (this.forcesData[forceId]) {
+                    this.forcesData[forceId][field] = value;
+                    this.updateAllViews();
+                }
+            }
+
+            updateFactorText(forceId, factorIndex, newValue) {
+                if (this.forcesData[forceId] && this.forcesData[forceId].factors[factorIndex] !== undefined) {
+                    this.forcesData[forceId].factors[factorIndex] = newValue;
+                    this.updateAllViews();
+                }
+            }
+
+            renderInitiatives() {
+                const container = document.getElementById('initiatives-container');
+                if (!container) return;
+
+                container.innerHTML = this.initiatives.map((init, idx) => `
+                    <div class="p-3.5 rounded-xl border transition ${init.active ? 'bg-indigo-950/40 border-indigo-500/50 shadow-md' : 'bg-slate-900/50 border-slate-800 opacity-75'} flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 rounded-lg bg-slate-800 text-indigo-400 mt-0.5">
+                                <i class="fa-solid ${init.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-xs text-white">${init.title}</h4>
+                                    <span class="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded-md font-medium">${init.type}</span>
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-0.5">${init.description}</p>
+                                <div class="flex items-center gap-3 text-[10px] text-emerald-400 mt-1.5 font-medium">
+                                    <span><i class="fa-solid fa-arrow-trend-up"></i> +${init.marginDelta}% Margen estimado</span>
+                                    <span><i class="fa-solid fa-shield"></i> Mitiga fuerzas críticas</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Button -->
+                        <button onclick="app.toggleInitiative(${idx})" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition ${init.active ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-800 text-slate-400 hover:text-white'}">
+                            ${init.active ? '<i class="fa-solid fa-check mr-1"></i> Activada' : 'Activar'}
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            toggleInitiative(index) {
+                this.initiatives[index].active = !this.initiatives[index].active;
+                this.renderInitiatives();
+                this.updateAllViews();
+                if (this.activeTab === 'dashboard') {
+                    this.renderCharts();
+                }
+            }
+
+            calculateMetrics() {
+                // Calculate Base Scores
+                let totalBaseScore = 0;
+                let criticalForce = PORTER_FORCES_META[0];
+                let maxScore = -1;
+
+                PORTER_FORCES_META.forEach(meta => {
+                    const force = this.forcesData[meta.id];
+                    const score = force ? force.score : 3.0;
+                    totalBaseScore += score;
+
+                    if (score > maxScore) {
+                        maxScore = score;
+                        criticalForce = meta;
+                    }
+                });
+
+                const avgBaseScore = totalBaseScore / 5;
+
+                // Calculate Simulated Scores after active initiatives
+                const simulatedForcesScores = {};
+                PORTER_FORCES_META.forEach(meta => {
+                    let sScore = this.forcesData[meta.id] ? this.forcesData[meta.id].score : 3.0;
+
+                    // Apply impacts of active initiatives
+                    this.initiatives.filter(i => i.active).forEach(init => {
+                        if (init.impacts[meta.id]) {
+                            sScore += init.impacts[meta.id]; // negative delta reduces pressure
+                        }
+                    });
+
+                    // Clamp between 1.0 and 5.0
+                    simulatedForcesScores[meta.id] = Math.max(1.0, Math.min(5.0, sScore));
+                });
+
+                let totalSimScore = Object.values(simulatedForcesScores).reduce((a, b) => a + b, 0);
+                const avgSimScore = totalSimScore / 5;
+
+                // Base Margin ~ 25% - (avgBaseScore * 3.5%)
+                const baseMargin = Math.max(2.0, 26.0 - (avgBaseScore * 3.2));
+                
+                // Margin gain from active initiatives
+                const marginGain = this.initiatives.filter(i => i.active).reduce((sum, i) => sum + i.marginDelta, 0);
+                const simulatedMargin = baseMargin + marginGain;
+
+                // Industry Attractiveness Index (Inverse of average pressure)
+                let attractiveness = "Media";
+                if (avgBaseScore <= 2.5) attractiveness = "Alta";
+                else if (avgBaseScore >= 3.8) attractiveness = "Baja";
+
+                return {
+                    avgBaseScore,
+                    avgSimScore,
+                    criticalForce,
+                    baseMargin,
+                    simulatedMargin,
+                    marginGain,
+                    attractiveness,
+                    simulatedForcesScores
+                };
+            }
+
+            updateAllViews() {
+                const metrics = this.calculateMetrics();
+
+                // Update Dashboard Bar Metrics
+                const scoreElem = document.getElementById('dash-avg-score');
+                if (scoreElem) scoreElem.innerText = `${metrics.avgBaseScore.toFixed(1)} / 5.0`;
+
+                const badgeElem = document.getElementById('dash-avg-badge');
+                if (badgeElem) {
+                    if (metrics.avgBaseScore > 3.6) {
+                        badgeElem.innerText = "Presión Elevada / Entorno Hostil";
+                        badgeElem.className = "text-[10px] text-rose-400 font-semibold";
+                    } else if (metrics.avgBaseScore < 2.6) {
+                        badgeElem.innerText = "Presión Favorable / Entorno Atractivo";
+                        badgeElem.className = "text-[10px] text-emerald-400 font-semibold";
+                    } else {
+                        badgeElem.innerText = "Presión Moderada";
+                        badgeElem.className = "text-[10px] text-amber-400 font-semibold";
+                    }
+                }
+
+                const attrElem = document.getElementById('dash-attractiveness-value');
+                if (attrElem) {
+                    attrElem.innerText = metrics.attractiveness;
+                    attrElem.className = `text-xl font-bold ${metrics.attractiveness === 'Alta' ? 'text-emerald-400' : metrics.attractiveness === 'Baja' ? 'text-rose-400' : 'text-amber-400'}`;
+                }
+
+                const marginElem = document.getElementById('dash-simulated-margin');
+                if (marginElem) marginElem.innerText = `${metrics.simulatedMargin.toFixed(1)}%`;
+
+                const marginDiffElem = document.getElementById('dash-margin-diff');
+                if (marginDiffElem) marginDiffElem.innerText = `+${metrics.marginGain.toFixed(1)}% por iniciativas activadas`;
+
+                const critElem = document.getElementById('dash-critical-force');
+                if (critElem) critElem.innerText = metrics.criticalForce.name.split(' ')[0];
+
+                // Mini forces list in dashboard
+                const miniList = document.getElementById('forces-mini-list');
+                if (miniList) {
+                    miniList.innerHTML = PORTER_FORCES_META.map(meta => {
+                        const baseSc = this.forcesData[meta.id] ? this.forcesData[meta.id].score : 3;
+                        const simSc = metrics.simulatedForcesScores[meta.id];
+                        return `
+                            <div class="flex items-center justify-between text-xs py-1 px-2 rounded bg-slate-900/60 border border-slate-800">
+                                <span class="text-slate-300 font-medium truncate max-w-[180px]">${meta.name}</span>
+                                <div class="flex items-center gap-2 font-mono">
+                                    <span class="text-slate-400 line-through">${baseSc.toFixed(1)}</span>
+                                    <span class="text-indigo-400 font-bold">${simSc.toFixed(1)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            renderCharts() {
+                const metrics = this.calculateMetrics();
+
+                const labels = PORTER_FORCES_META.map(m => m.name.split(' ')[0] + ' ' + (m.name.split(' ')[1] || ''));
+                const baseData = PORTER_FORCES_META.map(m => this.forcesData[m.id] ? this.forcesData[m.id].score : 3.0);
+                const simData = PORTER_FORCES_META.map(m => metrics.simulatedForcesScores[m.id]);
+
+                // 1. Radar Chart
+                const radarCtx = document.getElementById('radarChart')?.getContext('2d');
+                if (radarCtx) {
+                    if (this.radarChart) this.radarChart.destroy();
+
+                    this.radarChart = new Chart(radarCtx, {
+                        type: 'radar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Presión Base (Actual)',
+                                    data: baseData,
+                                    borderColor: 'rgba(244, 63, 94, 0.9)',
+                                    backgroundColor: 'rgba(244, 63, 94, 0.15)',
+                                    borderWidth: 2,
+                                    pointBackgroundColor: 'rgba(244, 63, 94, 1)'
+                                },
+                                {
+                                    label: 'Presión Mitigada (Simulación)',
+                                    data: simData,
+                                    borderColor: 'rgba(99, 102, 241, 0.9)',
+                                    backgroundColor: 'rgba(99, 102, 241, 0.25)',
+                                    borderWidth: 2,
+                                    pointBackgroundColor: 'rgba(99, 102, 241, 1)'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                r: {
+                                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                    pointLabels: { color: '#cbd5e1', font: { size: 10, weight: 'bold' } },
+                                    ticks: { color: '#94a3b8', backdropColor: 'transparent', stepSize: 1, min: 0, max: 5 }
+                                }
+                            },
+                            plugins: {
+                                legend: { labels: { color: '#e2e8f0', font: { size: 11 } }, position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Bar Chart
+                const barCtx = document.getElementById('barSimulationChart')?.getContext('2d');
+                if (barCtx) {
+                    if (this.barChart) this.barChart.destroy();
+
+                    this.barChart = new Chart(barCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Intensidad Inicial',
+                                    data: baseData,
+                                    backgroundColor: 'rgba(244, 63, 94, 0.7)',
+                                    borderRadius: 6
+                                },
+                                {
+                                    label: 'Intensidad Tras Iniciativas',
+                                    data: simData,
+                                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                                    borderRadius: 6
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    min: 0,
+                                    max: 5,
+                                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                    ticks: { color: '#94a3b8' }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: '#cbd5e1', font: { size: 10 } }
+                                }
+                            },
+                            plugins: {
+                                legend: { labels: { color: '#e2e8f0', font: { size: 10 } } }
+                            }
+                        }
+                    });
+                }
+            }
+
+            renderReport() {
+                // Metadata Fill
+                document.getElementById('report-company-title').innerText = this.metadata.company;
+                document.getElementById('report-industry-subtitle').innerText = `Sector: ${this.metadata.industry} | Mercado: ${this.metadata.market}`;
+                document.getElementById('report-business-model').innerText = this.metadata.businessModel;
+                document.getElementById('report-consultant').innerText = this.metadata.consultant;
+                document.getElementById('report-date').innerText = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                // Synthesis Matrix Table
+                const tbody = document.getElementById('report-matrix-tbody');
+                if (tbody) {
+                    tbody.innerHTML = PORTER_FORCES_META.map(meta => {
+                        const force = this.forcesData[meta.id] || { pressure: 'Media', factors: ['Factores clave'], impact: 'Impacto en margen' };
+                        const pressureBadgeClass = {
+                            'Alta': 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+                            'Media': 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+                            'Baja': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                        }[force.pressure] || 'bg-slate-800 text-slate-300';
+
+                        const mainFactor = force.factors[0] || 'Factores de mercado';
+
+                        return `
+                            <tr>
+                                <td class="p-3.5 font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid ${meta.icon} text-blue-400"></i> ${meta.name}
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${pressureBadgeClass}">
+                                        ${force.pressure}
+                                    </span>
+                                </td>
+                                <td class="p-3.5 text-slate-200 font-medium">
+                                    ${mainFactor}
+                                </td>
+                                <td class="p-3.5 text-slate-300 leading-snug">
+                                    ${force.impact}
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+                // Attractiveness Box
+                const metrics = this.calculateMetrics();
+                const attrBadge = document.getElementById('report-attractiveness-badge');
+                const attrDesc = document.getElementById('report-attractiveness-desc');
+
+                if (attrBadge) {
+                    attrBadge.innerText = metrics.attractiveness;
+                    attrBadge.className = `text-2xl font-black flex items-center gap-2 ${metrics.attractiveness === 'Alta' ? 'text-emerald-400' : metrics.attractiveness === 'Baja' ? 'text-rose-400' : 'text-amber-400'}`;
+                }
+
+                if (attrDesc) {
+                    if (metrics.attractiveness === 'Alta') {
+                        attrDesc.innerText = "Estructura industrial altamente atractiva con bajas barreras competitivas agregadas, permitiendo retornos superiores sobre la inversión a largo plazo.";
+                    } else if (metrics.attractiveness === 'Baja') {
+                        attrDesc.innerText = "Estructura de microentorno hostil con fuerte erosión de márgenes debido a la elevada presión combinada de competidores, sustitutos o proveedores.";
+                    } else {
+                        attrDesc.innerText = "Atractividad moderada. La rentabilidad del negocio dependerá fuertemente de la capacidad de ejecución y diferenciación estratégica de la empresa.";
+                    }
+                }
+
+                // Risk Factor Synthesis
+                const riskElem = document.getElementById('report-longterm-risk');
+                if (riskElem) {
+                    riskElem.innerText = `El riesgo estructural más severo proviene de "${metrics.criticalForce.name}". Si no se implementa una estrategia de contención, el negocio enfrenta erosin continua en su volumen de ventas o márgenes operativos.`;
+                }
+
+                // Actionable Strategic Recommendations (Top 3)
+                const recsContainer = document.getElementById('report-recommendations-list');
+                if (recsContainer) {
+                    const activeInits = this.initiatives.filter(i => i.active);
+                    const listToDisplay = activeInits.length >= 3 ? activeInits.slice(0, 3) : this.initiatives.slice(0, 3);
+
+                    recsContainer.innerHTML = listToDisplay.map((init, i) => `
+                        <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-indigo-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-square-check"></i> Iniciativa ${i + 1}
+                                </span>
+                                <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">${init.type}</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-white">${init.title}</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">${init.description}</p>
+                            <div class="text-[11px] text-emerald-400 font-semibold pt-1">
+                                Retorno proyectado: +${init.marginDelta}% en margen operativo
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            async generateAIAnalysis() {
+                const company = this.metadata.company;
+                const industry = this.metadata.industry;
+                const market = this.metadata.market;
+                const businessModel = this.metadata.businessModel;
+
+                const btn = document.getElementById('btn-ai-generate');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generando Diagnóstico con IA...`;
+                }
+
+                try {
+                    const systemPrompt = `Eres un consultor de estrategia empresarial de clase mundial experto en la metodología de las 5 Fuerzas de Porter.
+Proporciona un diagnóstico en formato JSON estructurado respetando la siguiente estructura para la empresa e industria especificadas:
+{
+  "forces": {
+    "rivalry": { "pressure": "Baja|Media|Alta", "score": 1.0-5.0, "factors": ["fact1", "fact2", "fact3"], "justification": "texto", "impact": "texto" },
+    "buyers": { "pressure": "Baja|Media|Alta", "score": 1.0-5.0, "factors": ["fact1", "fact2", "fact3"], "justification": "texto", "impact": "texto" },
+    "suppliers": { "pressure": "Baja|Media|Alta", "score": 1.0-5.0, "factors": ["fact1", "fact2", "fact3"], "justification": "texto", "impact": "texto" },
+    "entrants": { "pressure": "Baja|Media|Alta", "score": 1.0-5.0, "factors": ["fact1", "fact2", "fact3"], "justification": "texto", "impact": "texto" },
+    "substitutes": { "pressure": "Baja|Media|Alta", "score": 1.0-5.0, "factors": ["fact1", "fact2", "fact3"], "justification": "texto", "impact": "texto" }
+  }
+}`;
+
+                    const userQuery = `Empresa/Marca: ${company}
+Sector/Industria: ${industry}
+Mercado/Geografía: ${market}
+Modelo de Negocio: ${businessModel}
+
+Realiza el análisis riguroso de las 5 Fuerzas de Porter con explicaciones específicas para esta industria.`;
+
+                    const apiKey = ""; // Runtime auto-injected in Canvas
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        generationConfig: {
+                            responseMimeType: "application/json"
+                        }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (rawText) {
+                        const parsed = JSON.parse(rawText);
+                        if (parsed.forces) {
+                            this.forcesData = parsed.forces;
+                            this.renderForcesCards();
+                            this.updateAllViews();
+                            this.showNotification("Análisis autogenerado con éxito con Gemini AI.");
+                        }
+                    }
+                } catch (err) {
+                    console.error("AI Generation Error:", err);
+                    this.showNotification("Error al conectar con la IA. Se mantendrán los datos actuales.", true);
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-solid fa-sparkles"></i> Generar Análisis Completo con IA`;
+                    }
+                }
+            }
+
+            showNotification(msg, isError = false) {
+                const toast = document.createElement('div');
+                toast.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold text-white transition-all transform translate-y-0 ${isError ? 'bg-rose-600' : 'bg-indigo-600'}`;
+                toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'} mr-2"></i> ${msg}`;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Global App Initialization
+        let app;
+        window.onload = function() {
+            app = new PorterApp();
+            app.init();
+        };
+    </script>
+</body>
+</html>
