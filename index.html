@@ -268,6 +268,46 @@
                 </div>
             </div>
 
+            <!-- Diagrama Tradicional de las 5 Fuerzas de Porter -->
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-sitemap text-blue-500"></i> Diagrama Tradicional de 5 Fuerzas de Porter
+                        </h3>
+                        <p class="text-xs text-slate-400">Estructura canónica del microentorno con valoración de desempeño competitivo [Fuerte / Moderado / Vulnerable]</p>
+                    </div>
+                    <div class="flex items-center gap-3 text-[11px]">
+                        <span class="flex items-center gap-1.5 text-emerald-400 font-medium"><i class="fa-solid fa-circle text-[8px]"></i> Desempeño Fuerte</span>
+                        <span class="flex items-center gap-1.5 text-amber-400 font-medium"><i class="fa-solid fa-circle text-[8px]"></i> Moderado</span>
+                        <span class="flex items-center gap-1.5 text-rose-400 font-medium"><i class="fa-solid fa-circle text-[8px]"></i> Vulnerable</span>
+                    </div>
+                </div>
+
+                <!-- Grid Layout for 5 Forces Traditional Cross Structure -->
+                <div class="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-4 relative py-2">
+                    <!-- Top: Nuevos Entrantes -->
+                    <div id="diagram-card-entrants" class="md:col-start-2 md:row-start-1 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between transition-all hover:border-slate-700 shadow-md">
+                    </div>
+
+                    <!-- Left: Proveedores -->
+                    <div id="diagram-card-suppliers" class="md:col-start-1 md:row-start-2 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between transition-all hover:border-slate-700 shadow-md">
+                    </div>
+
+                    <!-- Center: Rivalidad entre Competidores -->
+                    <div id="diagram-card-rivalry" class="md:col-start-2 md:row-start-2 bg-gradient-to-br from-slate-900 via-blue-950/40 to-slate-900 border-2 border-blue-500/40 rounded-xl p-4 flex flex-col justify-between shadow-lg shadow-blue-500/10 transition-all">
+                    </div>
+
+                    <!-- Right: Compradores -->
+                    <div id="diagram-card-buyers" class="md:col-start-3 md:row-start-2 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between transition-all hover:border-slate-700 shadow-md">
+                    </div>
+
+                    <!-- Bottom: Sustitutos -->
+                    <div id="diagram-card-substitutes" class="md:col-start-2 md:row-start-3 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between transition-all hover:border-slate-700 shadow-md">
+                    </div>
+                </div>
+            </div>
+
             <!-- Charts and Interactive Simulator Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -864,23 +904,89 @@
                 const critElem = document.getElementById('dash-critical-force');
                 if (critElem) critElem.innerText = metrics.criticalForce.name.split(' ')[0];
 
+                // Update Traditional 5 Forces Diagram
+                this.updateTraditionalDiagram(metrics);
+
                 // Mini forces list in dashboard
                 const miniList = document.getElementById('forces-mini-list');
                 if (miniList) {
                     miniList.innerHTML = PORTER_FORCES_META.map(meta => {
-                        const baseSc = this.forcesData[meta.id] ? this.forcesData[meta.id].score : 3;
-                        const simSc = metrics.simulatedForcesScores[meta.id];
+                        const force = this.forcesData[meta.id] || { score: 3.0, pressure: "Media" };
+                        const simScore = metrics.simulatedForcesScores ? metrics.simulatedForcesScores[meta.id] : force.score;
                         return `
-                            <div class="flex items-center justify-between text-xs py-1 px-2 rounded bg-slate-900/60 border border-slate-800">
-                                <span class="text-slate-300 font-medium truncate max-w-[180px]">${meta.name}</span>
-                                <div class="flex items-center gap-2 font-mono">
-                                    <span class="text-slate-400 line-through">${baseSc.toFixed(1)}</span>
-                                    <span class="text-indigo-400 font-bold">${simSc.toFixed(1)}</span>
+                            <div class="flex items-center justify-between text-xs p-1.5 rounded bg-slate-900 border border-slate-800">
+                                <span class="text-slate-300 font-medium truncate max-w-[160px]"><i class="fa-solid ${meta.icon} text-blue-400 mr-1.5"></i> ${meta.name}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] text-slate-400">Score: <b class="text-white">${simScore.toFixed(1)}</b></span>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${force.pressure === 'Alta' ? 'bg-rose-500/10 text-rose-400' : force.pressure === 'Baja' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">${force.pressure}</span>
                                 </div>
                             </div>
                         `;
                     }).join('');
                 }
+            }
+
+            updateTraditionalDiagram(metrics) {
+                PORTER_FORCES_META.forEach(meta => {
+                    const card = document.getElementById(`diagram-card-${meta.id}`);
+                    if (!card) return;
+
+                    const force = this.forcesData[meta.id] || { score: 3.0, pressure: "Media", factors: [] };
+                    const simScore = metrics.simulatedForcesScores ? metrics.simulatedForcesScores[meta.id] : force.score;
+
+                    let perfText = "Moderado";
+                    let colorClass = "text-amber-400 bg-amber-500/10 border-amber-500/30";
+                    
+                    if (simScore <= 2.3) {
+                        perfText = "Fuerte (Ventaja)";
+                        colorClass = "text-emerald-400 bg-emerald-500/10 border-emerald-500/30";
+                    } else if (simScore >= 3.7) {
+                        perfText = "Vulnerable (Riesgo)";
+                        colorClass = "text-rose-400 bg-rose-500/10 border-rose-500/30";
+                    }
+
+                    const isRivalry = meta.id === 'rivalry';
+
+                    card.innerHTML = `
+                        <div class="space-y-2.5">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1.5">
+                                    <i class="fa-solid ${meta.icon} ${isRivalry ? 'text-blue-400' : 'text-slate-400'}"></i>
+                                    ${isRivalry ? '<span class="text-blue-400">NÚCLEO:</span>' : ''} ${meta.id.toUpperCase()}
+                                </span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${colorClass}">
+                                    ${force.pressure}
+                                </span>
+                            </div>
+                            
+                            <h4 class="font-bold text-xs text-white leading-tight">${meta.name}</h4>
+
+                            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center justify-between text-xs">
+                                <div>
+                                    <div class="text-[10px] text-slate-400">Desempeño Competitivo</div>
+                                    <div class="font-semibold text-[11px] ${colorClass.split(' ')[0]}">${perfText}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] text-slate-400">Presión</div>
+                                    <div class="font-mono font-bold text-white">${simScore.toFixed(1)} <span class="text-[9px] text-slate-400">/ 5</span></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="text-[10px] font-medium text-slate-400">Factores Clave:</div>
+                                <ul class="text-[11px] text-slate-300 space-y-1">
+                                    ${(force.factors || []).slice(0, 2).map(f => `<li class="truncate flex items-center gap-1"><i class="fa-solid fa-angle-right text-blue-500 text-[9px]"></i> ${f}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        ${isRivalry ? `
+                            <div class="mt-2 pt-2 border-t border-blue-500/20 text-[10px] text-blue-300 text-center font-medium bg-blue-500/10 rounded-lg py-1">
+                                <i class="fa-solid fa-arrows-to-circle mr-1"></i> Competencia Directa
+                            </div>
+                        ` : ''}
+                    `;
+                });
             }
 
             renderCharts() {
